@@ -11,6 +11,7 @@
                 <v-combobox
                   v-model="select"
                   :items="personalInformation"
+                  :rules="addressRules"
                   item-text="address"
                   item-value="id"
                   dense
@@ -18,14 +19,6 @@
                   return-object
                   class="pt-4"
                 ></v-combobox>
-
-                <!--<v-text-field
-                  v-model="address"
-                  :counter="100"
-                  :rules="addressRules"
-                  label="收件地址"
-                  required
-                ></v-text-field>-->
 
                 <v-text-field
                   v-model="name"
@@ -69,9 +62,7 @@
                     清除重填
                   </v-btn>
 
-                  <v-btn color="warning" @click="resetValidation">
-                    確認寄送
-                  </v-btn>
+                  <v-btn color="warning" @click="validate"> 確認寄送 </v-btn>
                 </v-row>
               </v-form>
             </template>
@@ -167,6 +158,7 @@
                             v-model="template.preset"
                             label="設為預設項目"
                             required
+                            :disabled="!newPreset ? false : true"
                           ></v-checkbox>
                         </v-col>
                       </v-row>
@@ -295,7 +287,10 @@ export default {
         preset: true
       }
     ],
+    /* 新增編輯判斷 */
     isNew: false,
+    /* 是否為首次新增 */
+    newPreset: false,
     template: {
       id: '',
       name: '',
@@ -307,29 +302,31 @@ export default {
   }),
   methods: {
     /* 表單按鈕 */
-    validate () {
-      this.$refs.form.validate()
-    },
     reset () {
       this.$refs.form.reset()
     },
-    resetValidation () {
+    validate () {
+      this.$refs.form.validate()
       if (this.checkbox === true) {
         const timestamp = Math.floor(Date.now())
-        let address
+        let newAddress
         if (typeof this.select === 'object') {
-          address = this.select.address
+          newAddress = this.select.address
         } else {
-          address = this.select
+          newAddress = this.select
+        }
+        if (this.personalInformation.length <= 0) {
+          this.newPreset = true
         }
         this.personalInformation.push({
           id: timestamp,
           name: this.name,
           phoneNumber: this.phoneNumber,
-          address: address,
+          address: newAddress,
           email: this.email,
-          preset: false
+          preset: this.newPreset
         })
+        this.upDateRadioGroup()
       }
     },
     clearTemplate () {
@@ -347,6 +344,11 @@ export default {
       if (this.isNew === true) {
         /* 新增 */
         const timestamp = Math.floor(Date.now())
+        if (this.newPreset === false && this.template.preset) {
+          this.personalInformation.forEach((item, index) => {
+            item.preset = false
+          })
+        }
         this.personalInformation.push({
           id: timestamp,
           name: this.template.name,
@@ -355,6 +357,7 @@ export default {
           email: this.template.email,
           preset: this.template.preset
         })
+        this.upDateRadioGroup()
       } else {
         /* 編輯 */
         this.personalInformation.forEach((item, index) => {
@@ -362,7 +365,6 @@ export default {
             newIndex = index
           }
         })
-
         if (this.template.preset === true) {
           this.personalInformation.forEach((item, index) => {
             item.preset = false
@@ -380,6 +382,12 @@ export default {
       if (isNew === true) {
         this.clearTemplate()
         this.isNew = true
+        if (this.personalInformation.length <= 0) {
+          this.newPreset = true
+          this.template.preset = true
+        } else {
+          this.newPreset = false
+        }
       } else {
         this.isNew = false
         this.template = Object.assign({}, personalItem)
@@ -437,7 +445,7 @@ export default {
   },
   watch: {
     select () {
-      if (typeof this.select === 'object') {
+      if (typeof this.select === 'object' && !this.select === '') {
         this.template = this.personalInformation.find((item, index) => {
           return this.select.id === item.id
         })
