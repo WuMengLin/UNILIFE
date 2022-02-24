@@ -95,7 +95,7 @@
             <v-list-item-content class="justify-space-between">
               <v-list-item-title>新增收件人</v-list-item-title>
               <v-list-item-subtitle
-                >設定資訊簿方便下次結帳選用</v-list-item-subtitle
+                >設定資訊簿方便結帳選用</v-list-item-subtitle
               >
             </v-list-item-content>
             <v-list-item-content>
@@ -445,7 +445,7 @@ export default {
   },
   watch: {
     select () {
-      if (typeof this.select === 'object' && !this.select === '') {
+      if (typeof this.select === 'object' && !(this.select === null)) {
         this.template = this.personalInformation.find((item, index) => {
           return this.select.id === item.id
         })
