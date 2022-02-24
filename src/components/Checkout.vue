@@ -19,7 +19,6 @@
                   return-object
                   class="pt-4"
                 ></v-combobox>
-
                 <v-text-field
                   v-model="name"
                   :counter="50"
@@ -27,13 +26,11 @@
                   label="收件人"
                   required
                 ></v-text-field>
-
                 <v-text-field
                   v-model="email"
                   label="E-mail"
                   required
                 ></v-text-field>
-
                 <v-text-field
                   v-model="phoneNumber"
                   :rules="phoneNumberRules"
@@ -41,13 +38,11 @@
                   label="連絡電話"
                   required
                 ></v-text-field>
-
                 <v-checkbox
                   v-model="checkbox"
                   label="將此次寄送資料新增到資訊簿"
                   required
                 ></v-checkbox>
-
                 <v-row align="center" justify="start" no-gutters>
                   <v-btn
                     color="primary"
@@ -57,11 +52,9 @@
                   >
                     編輯資訊簿
                   </v-btn>
-
                   <v-btn color="error" class="mr-4" @click="reset">
                     清除重填
                   </v-btn>
-
                   <v-btn color="warning" @click="validate"> 確認寄送 </v-btn>
                 </v-row>
               </v-form>
@@ -326,7 +319,7 @@ export default {
           email: this.email,
           preset: this.newPreset
         })
-        this.upDateRadioGroup()
+        this.updateRadioGroup()
       }
     },
     clearTemplate () {
@@ -357,7 +350,7 @@ export default {
           email: this.template.email,
           preset: this.template.preset
         })
-        this.upDateRadioGroup()
+        this.updateRadioGroup()
       } else {
         /* 編輯 */
         this.personalInformation.forEach((item, index) => {
@@ -370,7 +363,7 @@ export default {
             item.preset = false
           })
           this.personalInformation[newIndex] = Object.assign({}, this.template)
-          this.upDateRadioGroup()
+          this.updateRadioGroup()
         } else {
           this.personalInformation[newIndex] = Object.assign({}, this.template)
         }
@@ -400,7 +393,7 @@ export default {
           newIndex = index
           if (!(item.preset === true && this.personalInformation.length >= 2)) {
             this.personalInformation.splice(newIndex, 1)
-            this.upDateRadioGroup()
+            this.updateRadioGroup()
           } else {
             alert('請先更換預設地址')
           }
@@ -412,7 +405,7 @@ export default {
         this.template = this.personalInformation.find((item, index) => {
           return item.preset === true
         })
-        this.upDateRadioGroup()
+        this.updateRadioGroup()
         this.select = Object.assign({}, this.template)
         this.address = this.template.address
         this.name = this.template.name
@@ -426,21 +419,12 @@ export default {
       })
       this.personalInformation[index].preset = true
     },
-    upDateRadioGroup () {
+    updateRadioGroup () {
       this.radioGroup = this.personalInformation
         .map((item, index) => {
           return item.preset
         })
         .indexOf(true)
-    }
-  },
-  computed: {
-    personalInformationItem () {
-      const array = []
-      for (let i = 0; i < this.personalInformation.length; i++) {
-        array.push(this.personalInformation[i].id)
-      }
-      return array
     }
   },
   watch: {
